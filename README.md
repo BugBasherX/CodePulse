@@ -23,7 +23,7 @@ CodePulse is a comprehensive code coverage monitoring platform that provides rea
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/DevMaestroHQ/CodePulse.git
 cd codepulse
 ```
 
