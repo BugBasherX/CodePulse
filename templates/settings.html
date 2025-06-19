@@ -4,352 +4,349 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-3">
-        <!-- Settings Navigation -->
-        <div class="card">
+    <div class="col-12">
+        <h1 class="h2 mb-4">
+            <i class="fas fa-cog text-primary me-2"></i>Settings
+        </h1>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Profile Settings -->
+    <div class="col-lg-8">
+        <div class="card mb-4">
             <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-cog me-2"></i>Settings
-                </h6>
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-2"></i>Profile Information
+                </h5>
             </div>
-            <div class="list-group list-group-flush">
-                <a href="#profile" class="list-group-item list-group-item-action active" data-bs-toggle="pill">
-                    <i class="fas fa-user me-2"></i>Profile
-                </a>
-                <a href="#api-tokens" class="list-group-item list-group-item-action" data-bs-toggle="pill">
-                    <i class="fas fa-key me-2"></i>API Tokens
-                </a>
-                <a href="#projects" class="list-group-item list-group-item-action" data-bs-toggle="pill">
-                    <i class="fas fa-folder me-2"></i>Projects
-                </a>
-                {% if action == 'new_project' %}
-                <a href="#new-project" class="list-group-item list-group-item-action" data-bs-toggle="pill">
-                    <i class="fas fa-plus me-2"></i>New Project
-                </a>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('update_profile') }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" 
+                                   value="{{ current_user.first_name or '' }}" maxlength="50">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" 
+                                   value="{{ current_user.last_name or '' }}" maxlength="50">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   value="{{ current_user.username or '' }}" maxlength="50" 
+                                   pattern="[a-zA-Z0-9_-]+" title="Only letters, numbers, underscores, and hyphens allowed">
+                            <div class="form-text">Only letters, numbers, underscores, and hyphens allowed</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ current_user.email or '' }}" maxlength="120">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                   value="{{ current_user.phone_number or '' }}" maxlength="20">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   value="{{ current_user.location or '' }}" maxlength="100" 
+                                   placeholder="City, Country">
+                        </div>
+                        <div class="col-12">
+                            <label for="website" class="form-label">Website</label>
+                            <input type="url" class="form-control" id="website" name="website" 
+                                   value="{{ current_user.website or '' }}" maxlength="200" 
+                                   placeholder="https://example.com">
+                        </div>
+                        <div class="col-12">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3" 
+                                      maxlength="500" placeholder="Tell us about yourself...">{{ current_user.bio or '' }}</textarea>
+                            <div class="form-text">500 characters maximum</div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Preferences -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-sliders-h me-2"></i>Preferences
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('update_preferences') }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="theme_preference" class="form-label">Theme</label>
+                            <select class="form-select" id="theme_preference" name="theme_preference">
+                                <option value="light" {% if current_user.theme_preference == 'light' %}selected{% endif %}>Light</option>
+                                <option value="dark" {% if current_user.theme_preference == 'dark' %}selected{% endif %}>Dark</option>
+                                <option value="auto" {% if current_user.theme_preference == 'auto' %}selected{% endif %}>Auto (System)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="timezone" class="form-label">Timezone</label>
+                            <select class="form-select" id="timezone" name="timezone">
+                                <option value="UTC" {% if current_user.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                                <option value="America/New_York" {% if current_user.timezone == 'America/New_York' %}selected{% endif %}>Eastern Time</option>
+                                <option value="America/Chicago" {% if current_user.timezone == 'America/Chicago' %}selected{% endif %}>Central Time</option>
+                                <option value="America/Denver" {% if current_user.timezone == 'America/Denver' %}selected{% endif %}>Mountain Time</option>
+                                <option value="America/Los_Angeles" {% if current_user.timezone == 'America/Los_Angeles' %}selected{% endif %}>Pacific Time</option>
+                                <option value="Europe/London" {% if current_user.timezone == 'Europe/London' %}selected{% endif %}>London</option>
+                                <option value="Europe/Paris" {% if current_user.timezone == 'Europe/Paris' %}selected{% endif %}>Paris</option>
+                                <option value="Asia/Tokyo" {% if current_user.timezone == 'Asia/Tokyo' %}selected{% endif %}>Tokyo</option>
+                                <option value="Asia/Shanghai" {% if current_user.timezone == 'Asia/Shanghai' %}selected{% endif %}>Shanghai</option>
+                                <option value="Australia/Sydney" {% if current_user.timezone == 'Australia/Sydney' %}selected{% endif %}>Sydney</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Notifications</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="email_notifications" 
+                                       name="email_notifications" {% if current_user.email_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="email_notifications">
+                                    Email notifications for important updates
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="coverage_notifications" 
+                                       name="coverage_notifications" {% if current_user.coverage_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="coverage_notifications">
+                                    Coverage report notifications
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Preferences
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- API Token -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-key me-2"></i>API Token
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Use this token to upload coverage reports via API</p>
+                
+                {% if current_user.api_token %}
+                <div class="input-group mb-3">
+                    <input type="password" class="form-control font-monospace" value="{{ current_user.api_token }}" 
+                           readonly id="apiToken">
+                    <button class="btn btn-outline-secondary" type="button" onclick="toggleTokenVisibility()">
+                        <i class="fas fa-eye" id="tokenEye"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('apiToken')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                
+                <form method="POST" action="{{ url_for('regenerate_api_token') }}" class="d-inline">
+                    <button type="submit" class="btn btn-warning btn-sm" 
+                            onclick="return confirm('This will invalidate your current token. Continue?')">
+                        <i class="fas fa-sync me-1"></i>Regenerate
+                    </button>
+                </form>
+                {% else %}
+                <form method="POST" action="{{ url_for('regenerate_api_token') }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-key me-1"></i>Generate Token
+                    </button>
+                </form>
                 {% endif %}
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-9">
-        <div class="tab-content">
-            <!-- Profile Settings -->
-            <div class="tab-pane fade show active" id="profile">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-user me-2"></i>Profile Information
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3 text-center">
-                                {% if current_user.profile_image_url %}
-                                <img src="{{ current_user.profile_image_url }}" 
-                                     alt="Profile Picture" 
-                                     class="rounded-circle mb-3" 
-                                     width="120" height="120" 
-                                     style="object-fit: cover;">
-                                {% else %}
-                                <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
-                                     style="width: 120px; height: 120px;">
-                                    <i class="fas fa-user fa-3x text-muted"></i>
-                                </div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-9">
-                                <table class="table table-borderless">
-                                    <tr>
-                                        <td class="text-muted">Display Name:</td>
-                                        <td><strong>{{ current_user.display_name }}</strong></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted">Email:</td>
-                                        <td>{{ current_user.email or 'Not provided' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted">User ID:</td>
-                                        <td><code>{{ current_user.id }}</code></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-muted">Member Since:</td>
-                                        <td>{{ current_user.created_at.strftime('%B %d, %Y') }}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+
+        <!-- Account Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Account Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 small">
+                    <div class="col-6 text-muted">User ID:</div>
+                    <div class="col-6 font-monospace">{{ current_user.id }}</div>
+                    <div class="col-6 text-muted">Member since:</div>
+                    <div class="col-6">{{ current_user.created_at.strftime('%B %Y') }}</div>
+                    <div class="col-6 text-muted">Last updated:</div>
+                    <div class="col-6">{{ current_user.updated_at.strftime('%Y-%m-%d') }}</div>
+                    {% if current_user.last_login %}
+                    <div class="col-6 text-muted">Last login:</div>
+                    <div class="col-6">{{ current_user.last_login.strftime('%Y-%m-%d %H:%M') }}</div>
+                    {% endif %}
                 </div>
             </div>
-            
-            <!-- API Tokens -->
-            <div class="tab-pane fade" id="api-tokens">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-key me-2"></i>API Tokens
-                        </h5>
-                        {% if not current_user.api_token %}
-                        <button class="btn btn-primary btn-sm" onclick="generateToken()">
-                            <i class="fas fa-plus me-2"></i>Generate Token
-                        </button>
-                        {% endif %}
-                    </div>
-                    <div class="card-body">
-                        {% if current_user.api_token %}
-                        <div class="alert alert-info">
-                            <h6 class="alert-heading">
-                                <i class="fas fa-info-circle me-2"></i>Your API Token
-                            </h6>
-                            <p class="mb-2">Use this token to upload coverage reports via API or CLI tools:</p>
-                            <div class="input-group">
-                                <input type="password" class="form-control font-monospace" 
-                                       id="apiToken" value="{{ current_user.api_token }}" readonly>
-                                <button class="btn btn-outline-secondary" type="button" onclick="toggleTokenVisibility()">
-                                    <i class="fas fa-eye" id="toggleIcon"></i>
-                                </button>
-                                <button class="btn btn-outline-primary" type="button" onclick="copyToken()">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                            <div class="mt-3">
-                                <small class="text-muted">
-                                    Keep this token secure. Anyone with this token can upload coverage reports to your projects.
-                                </small>
-                            </div>
-                        </div>
-                        
-                        <h6>Usage Examples:</h6>
-                        <div class="bg-dark text-light p-3 rounded">
-                            <p class="mb-2"><strong>cURL:</strong></p>
-                            <code>curl -X POST -H "Authorization: Bearer {{ current_user.api_token }}" \<br>
-                            &nbsp;&nbsp;-F "file=@coverage.xml" -F "project=PROJECT_SLUG" \<br>
-                            &nbsp;&nbsp;{{ request.url_root }}api/upload</code>
-                        </div>
-                        {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-key fa-3x text-muted mb-3"></i>
-                            <h6 class="text-muted">No API Token</h6>
-                            <p class="text-muted">Generate an API token to upload coverage reports via API</p>
-                            <button class="btn btn-primary" onclick="generateToken()">
-                                <i class="fas fa-plus me-2"></i>Generate API Token
-                            </button>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
+        </div>
+
+        <!-- API Usage -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-code me-2"></i>API Usage
+                </h5>
             </div>
-            
-            <!-- Projects -->
-            <div class="tab-pane fade" id="projects">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-folder me-2"></i>Your Projects
-                        </h5>
-                        <a href="{{ url_for('new_project') }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus me-2"></i>New Project
-                        </a>
-                    </div>
-                    <div class="card-body p-0">
-                        {% if projects %}
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Project</th>
-                                        <th>Visibility</th>
-                                        <th>Coverage</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for project in projects %}
-                                    <tr>
-                                        <td>
-                                            <div>
-                                                <h6 class="mb-0">
-                                                    <a href="{{ url_for('project_detail', slug=project.slug) }}" 
-                                                       class="text-decoration-none">
-                                                        {{ project.name }}
-                                                    </a>
-                                                </h6>
-                                                {% if project.description %}
-                                                <small class="text-muted">{{ project.description[:50] }}{% if project.description|length > 50 %}...{% endif %}</small>
-                                                {% endif %}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            {% if project.is_public %}
-                                            <span class="badge bg-success">Public</span>
-                                            {% else %}
-                                            <span class="badge bg-secondary">Private</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if project.latest_coverage %}
-                                            <span class="text-{{ project.latest_coverage.coverage_color }}">
-                                                {{ "%.1f"|format(project.coverage_percentage) }}%
-                                            </span>
-                                            {% else %}
-                                            <span class="text-muted">No reports</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <small class="text-muted">
-                                                {{ project.created_at.strftime('%Y-%m-%d') }}
-                                            </small>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="{{ url_for('project_detail', slug=project.slug) }}" 
-                                                   class="btn btn-outline-primary" title="View Project">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="{{ url_for('upload_coverage', slug=project.slug) }}" 
-                                                   class="btn btn-outline-success" title="Upload Coverage">
-                                                    <i class="fas fa-upload"></i>
-                                                </a>
-                                                <a href="{{ url_for('coverage_badge', slug=project.slug) }}" 
-                                                   target="_blank" class="btn btn-outline-info" title="Coverage Badge">
-                                                    <i class="fas fa-shield-alt"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        {% else %}
-                        <div class="text-center py-5">
-                            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-                            <h6 class="text-muted">No Projects</h6>
-                            <p class="text-muted">Create your first project to start monitoring coverage</p>
-                            <a href="{{ url_for('new_project') }}" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>Create Project
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
+            <div class="card-body">
+                <p class="text-muted small">Upload coverage reports using curl:</p>
+                <pre class="bg-dark text-light p-3 rounded small"><code>curl -X POST {{ request.url_root }}api/upload \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "file=@coverage.xml" \
+  -F "project_slug=your-project"</code></pre>
             </div>
-            
-            <!-- New Project Form -->
-            {% if action == 'new_project' %}
-            <div class="tab-pane fade show active" id="new-project">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-plus me-2"></i>Create New Project
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Project Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" required 
-                                       placeholder="My Awesome Project">
-                                <div class="form-text">Choose a descriptive name for your project</div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3" 
-                                          placeholder="Brief description of your project"></textarea>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="github_repo" class="form-label">GitHub Repository</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fab fa-github"></i>
-                                    </span>
-                                    <input type="text" class="form-control" id="github_repo" name="github_repo" 
-                                           placeholder="username/repository">
-                                </div>
-                                <div class="form-text">Optional: Link to your GitHub repository (format: owner/repo)</div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="is_public" name="is_public">
-                                    <label class="form-check-label" for="is_public">
-                                        <strong>Make this project public</strong>
-                                        <div class="small text-muted">
-                                            Public projects can be viewed by anyone. Coverage badges will also be publicly accessible.
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left me-2"></i>Cancel
-                                </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus me-2"></i>Create Project
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                </h5>
             </div>
-            {% endif %}
+            <div class="card-body">
+                <h6 class="text-danger">Delete Account</h6>
+                <p class="text-muted small">This action cannot be undone. All your projects and coverage data will be permanently deleted.</p>
+                
+                <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <i class="fas fa-trash me-1"></i>Delete Account
+                </button>
+            </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Delete Account
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('delete_account') }}">
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <strong>Warning:</strong> This action is irreversible and will:
+                        <ul class="mb-0 mt-2">
+                            <li>Delete all your projects and coverage reports</li>
+                            <li>Remove all project memberships</li>
+                            <li>Permanently delete your account</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="confirmation" class="form-label">
+                            Type <strong>"delete my account"</strong> to confirm:
+                        </label>
+                        <input type="text" class="form-control" id="confirmation" name="confirmation" 
+                               required placeholder="delete my account">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Delete My Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
-// Handle active tab based on action parameter
-{% if action == 'new_project' %}
-document.addEventListener('DOMContentLoaded', function() {
-    // Activate new project tab
-    document.querySelector('a[href="#new-project"]').click();
-});
-{% endif %}
-
-function generateToken() {
-    if (confirm('Generate a new API token? This will replace any existing token.')) {
-        // In a real implementation, this would make an AJAX call to generate a new token
-        alert('Token generation would be implemented here');
-        location.reload();
+function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.type = 'text';
+    element.select();
+    document.execCommand('copy');
+    element.type = 'password';
+    
+    // Show feedback
+    if (window.mobileHandler) {
+        window.mobileHandler.showMobileToast('API token copied to clipboard!', 'success');
+    } else {
+        // Fallback for desktop
+        const copyBtn = element.parentNode.querySelector('.btn:last-child');
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+        copyBtn.classList.remove('btn-outline-secondary');
+        copyBtn.classList.add('btn-success');
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalHTML;
+            copyBtn.classList.remove('btn-success');
+            copyBtn.classList.add('btn-outline-secondary');
+        }, 2000);
     }
 }
 
 function toggleTokenVisibility() {
     const tokenInput = document.getElementById('apiToken');
-    const toggleIcon = document.getElementById('toggleIcon');
+    const eyeIcon = document.getElementById('tokenEye');
     
     if (tokenInput.type === 'password') {
         tokenInput.type = 'text';
-        toggleIcon.className = 'fas fa-eye-slash';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
     } else {
         tokenInput.type = 'password';
-        toggleIcon.className = 'fas fa-eye';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
     }
 }
 
-function copyToken() {
-    const tokenInput = document.getElementById('apiToken');
-    const originalType = tokenInput.type;
+// Theme change handler
+document.getElementById('theme_preference').addEventListener('change', function() {
+    const theme = this.value;
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+    } else if (theme === 'dark') {
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
+    } else {
+        // Auto theme - detect system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
+    }
+});
+
+// Character counter for bio
+document.getElementById('bio').addEventListener('input', function() {
+    const maxLength = 500;
+    const currentLength = this.value.length;
+    const remaining = maxLength - currentLength;
     
-    // Temporarily change to text to copy
-    tokenInput.type = 'text';
-    tokenInput.select();
-    document.execCommand('copy');
-    tokenInput.type = originalType;
-    
-    // Show feedback
-    const copyBtn = event.target.closest('button');
-    const originalHTML = copyBtn.innerHTML;
-    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-    setTimeout(() => {
-        copyBtn.innerHTML = originalHTML;
-    }, 2000);
-}
+    let helpText = this.parentNode.querySelector('.form-text');
+    if (remaining < 50) {
+        helpText.textContent = `${remaining} characters remaining`;
+        helpText.className = 'form-text text-warning';
+    } else {
+        helpText.textContent = '500 characters maximum';
+        helpText.className = 'form-text';
+    }
+});
 </script>
 {% endblock %}

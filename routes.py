@@ -211,15 +211,7 @@ def coverage_badge(slug):
     
     return app.response_class(svg_content, mimetype='image/svg+xml')
 
-@app.route('/settings')
-@require_login
-def settings():
-    # Generate API token if user doesn't have one
-    if not current_user.api_token:
-        current_user.generate_api_token()
-    
-    user_projects = Project.query.filter_by(owner_id=current_user.id).all()
-    return render_template('settings.html', projects=user_projects)
+
 
 @app.route('/api/upload', methods=['POST'])
 def api_upload():
@@ -318,3 +310,132 @@ def manifest():
 @app.route('/service-worker.js')
 def service_worker():
     return send_from_directory('static', 'service-worker.js')
+
+@app.route('/settings')
+@require_login
+def settings():
+    # Generate API token if user doesn't have one
+    if not current_user.api_token:
+        current_user.generate_api_token()
+    
+    return render_template('settings.html', user=current_user)
+
+@app.route('/settings/profile', methods=['POST'])
+@require_login
+def update_profile():
+    try:
+        # Update basic profile information
+        current_user.first_name = request.form.get('first_name', '').strip()
+        current_user.last_name = request.form.get('last_name', '').strip()
+        current_user.bio = request.form.get('bio', '').strip()
+        current_user.location = request.form.get('location', '').strip()
+        current_user.website = request.form.get('website', '').strip()
+        current_user.phone_number = request.form.get('phone_number', '').strip()
+        
+        # Validate and update username
+        new_username = request.form.get('username', '').strip()
+        if new_username and new_username != current_user.username:
+            existing_user = User.query.filter_by(username=new_username).first()
+            if existing_user:
+                flash('Username already exists. Please choose a different one.', 'error')
+                return redirect(url_for('settings'))
+            current_user.username = new_username
+        
+        # Validate and update email
+        new_email = request.form.get('email', '').strip()
+        if new_email and new_email != current_user.email:
+            existing_user = User.query.filter_by(email=new_email).first()
+            if existing_user:
+                flash('Email already exists. Please choose a different one.', 'error')
+                return redirect(url_for('settings'))
+            current_user.email = new_email
+        
+        current_user.updated_at = datetime.now()
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating profile: {str(e)}', 'error')
+    
+    return redirect(url_for('settings'))
+
+@app.route('/settings/preferences', methods=['POST'])
+@require_login
+def update_preferences():
+    try:
+        current_user.theme_preference = request.form.get('theme_preference', 'dark')
+        current_user.timezone = request.form.get('timezone', 'UTC')
+        current_user.email_notifications = 'email_notifications' in request.form
+        current_user.coverage_notifications = 'coverage_notifications' in request.form
+        
+        current_user.updated_at = datetime.now()
+        db.session.commit()
+        flash('Preferences updated successfully!', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error updating preferences: {str(e)}', 'error')
+    
+    return redirect(url_for('settings'))
+
+@app.route('/settings/regenerate-token', methods=['POST'])
+@require_login
+def regenerate_api_token():
+    try:
+        current_user.generate_api_token()
+        db.session.commit()
+        flash('API token regenerated successfully!', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error regenerating API token: {str(e)}', 'error')
+    
+    return redirect(url_for('settings'))
+
+@app.route('/settings/delete-account', methods=['POST'])
+@require_login
+def delete_account():
+    try:
+        # Verify password or confirmation
+        confirmation = request.form.get('confirmation', '').strip()
+        if confirmation.lower() != 'delete my account':
+            flash('Please type "delete my account" to confirm account deletion.', 'error')
+            return redirect(url_for('settings'))
+        
+        user_id = current_user.id
+        
+        # Delete user's projects and associated data
+        projects = Project.query.filter_by(owner_id=user_id).all()
+        for project in projects:
+            # Delete coverage reports and file coverage
+            reports = CoverageReport.query.filter_by(project_id=project.id).all()
+            for report in reports:
+                FileCoverage.query.filter_by(report_id=report.id).delete()
+                db.session.delete(report)
+            
+            # Delete project members
+            ProjectMember.query.filter_by(project_id=project.id).delete()
+            db.session.delete(project)
+        
+        # Delete OAuth tokens
+        OAuth.query.filter_by(user_id=user_id).delete()
+        
+        # Delete project memberships
+        ProjectMember.query.filter_by(user_id=user_id).delete()
+        
+        # Delete user account
+        db.session.delete(current_user)
+        db.session.commit()
+        
+        # Logout user
+        from flask_login import logout_user
+        logout_user()
+        
+        flash('Your account has been successfully deleted.', 'info')
+        return redirect(url_for('index'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting account: {str(e)}', 'error')
+        return redirect(url_for('settings'))
