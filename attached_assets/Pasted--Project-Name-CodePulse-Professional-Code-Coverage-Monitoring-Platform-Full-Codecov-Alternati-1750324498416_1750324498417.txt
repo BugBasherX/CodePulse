@@ -1,0 +1,220 @@
+🛠️ Project Name:
+CodePulse – Professional Code Coverage Monitoring Platform (Full Codecov Alternative)
+
+🎯 Objective:
+Build a fully advanced, enterprise-level code coverage tracking platform like Codecov called CodePulse, with:
+
+Multi-language report parsing
+
+Live coverage dashboards
+
+CI/CD integration (GitHub, GitLab, Bitbucket)
+
+GitHub App with pull request comments
+
+Team & project management
+
+Cloud storage support
+
+OAuth2 user login
+
+Diff and historical comparison
+
+Email/push alert support
+
+Coverage badges
+
+🧰 Tech Stack:
+🔹 Backend:
+Language: Python 3.11
+
+Framework: FastAPI + SQLAlchemy
+
+Auth: OAuth2 + JWT (Google/GitHub login)
+
+Database: PostgreSQL (hosted or local)
+
+Cache/Queue: Redis + Celery for background jobs
+
+Storage: Amazon S3 (or Replit FS fallback)
+
+GitHub App: Integration for PR commenting
+
+Email: SMTP + SendGrid or Replit Email API
+
+🔹 Frontend:
+Language: TypeScript
+
+Framework: Next.js or React + Tailwind CSS
+
+State Mgmt: Redux Toolkit
+
+Charting: Chart.js, D3.js
+
+Features:
+
+Live dashboards
+
+File heatmaps
+
+Historical tracking
+
+Settings & teams
+
+🔹 CLI Uploader Tool:
+Language: Go or Python
+
+Features:
+
+Auto-detect supported report files
+
+Compress + upload with auth
+
+Auto-integrate with CI platforms
+
+📦 Features to Implement:
+✅ 1. Authentication & User Accounts
+Login via GitHub, Google (OAuth2)
+
+Token generation for CLI upload
+
+Organization & team support
+
+✅ 2. CI/CD Integration
+GitHub App for PR annotations
+
+CI token verification
+
+Sample GitHub Action, GitLab CI, Jenkinsfile
+
+✅ 3. Report Handling
+Accept and parse:
+
+coverage.xml, lcov.info, cobertura.xml, go-cover.out, jacoco.xml
+
+Normalize to internal format
+
+Store historical coverage with timestamps
+
+✅ 4. Coverage Visualization
+Total %, line coverage, branch coverage, function coverage
+
+File tree with % indicators
+
+Line-by-line heatmap display
+
+Change (diff) highlighting for PRs
+
+✅ 5. Dashboard UI
+Project summary with trends
+
+Filters (by date, branch, commit, author)
+
+History comparison (commit-to-commit)
+
+Download/export reports
+
+✅ 6. Notifications & Badges
+Email alerts when coverage drops
+
+Slack/Webhook integrations
+
+Auto-generated badges for repos
+
+✅ 7. Settings & Admin Panel
+Project setup wizard
+
+Token management
+
+Webhooks config
+
+Member roles and permissions
+
+✅ 8. CLI Tool
+Auth via token
+
+Auto-detect repo type & CI
+
+Upload command:
+
+bash
+Copy
+Edit
+codepulse upload --token=XYZ --file=coverage.xml
+✅ 9. Documentation
+Developer API Docs (Swagger / Redoc)
+
+User setup docs (Markdown + Site)
+
+Sample CI/CD YAML files
+
+📁 Suggested Project Structure
+arduino
+Copy
+Edit
+/codepulse/
+├── backend/
+│   ├── app/ (FastAPI services)
+│   ├── db/ (models, migrations)
+│   ├── parsers/ (coverage formats)
+│   └── workers/ (Celery tasks)
+├── frontend/
+│   └── pages/, components/, charts/
+├── cli-uploader/
+│   └── main.py or main.go
+├── github-app/
+│   └── webhooks, auth
+├── docker/
+│   └── Dockerfiles for backend/frontend
+├── devops/
+│   └── CI samples, Nginx config
+├── docs/
+│   └── README.md, setup, swagger.json
+└── replit.nix
+⚙️ Agent Instructions
+Replit AI Agent must:
+
+Build a fully functional backend in FastAPI with RESTful API and GitHub PR integrations.
+
+Build a responsive frontend in React (or Next.js if multi-page).
+
+Build a CLI uploader (binary or script).
+
+Set up auth (OAuth2), DB (PostgreSQL), and file storage (S3 or Replit FS).
+
+Parse and normalize multiple coverage formats.
+
+Build GitHub App stub (simulated if GitHub SDK not available).
+
+Integrate tests and CI/CD sample files.
+
+Finalize with documentation, test data, demo scripts.
+
+✅ Deliverables:
+Complete web app (frontend + backend)
+
+Fully working uploader CLI
+
+Live coverage visualizations
+
+GitHub PR comment handler
+
+CI integration examples
+
+OAuth login and team support
+
+Deployment-ready Docker setup
+
+Clean and documented codebase
+
+🤖 Deployment Environment (Optional):
+Localhost or Replit preview
+
+Deployable to Vercel (frontend) + Render/Fly.io (backend)
+
+Use .env or Replit Secrets
+
+🔚 Final Notes:
+This is an advanced full-stack SaaS-style coverage platform, built to function as a true alternative to Codecov. The agent must generate all components, wire them together, and test them, with full local development setup.
+
+DO NOT stop at a basic version. Build a production-grade app.
