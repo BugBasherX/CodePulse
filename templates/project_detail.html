@@ -9,7 +9,7 @@
 {% block content %}
 <!-- Project Header -->
 <div class="row mb-4">
-    <div class="col-md-8">
+    <div class="col-12">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
@@ -17,12 +17,22 @@
             </ol>
         </nav>
         
-        <div class="d-flex align-items-center mb-2">
-            <h1 class="h2 mb-0 me-3">{{ project.name }}</h1>
-            {% if project.is_public %}
-            <span class="badge bg-success">Public</span>
-            {% else %}
-            <span class="badge bg-secondary">Private</span>
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-3">
+            <div class="d-flex align-items-center mb-2 mb-md-0">
+                <h1 class="h3 h-md-2 mb-0 me-3">{{ project.name }}</h1>
+                {% if project.is_public %}
+                <span class="badge bg-success">Public</span>
+                {% else %}
+                <span class="badge bg-secondary">Private</span>
+                {% endif %}
+            </div>
+            
+            {% if current_user.is_authenticated and current_user.id == project.owner_id %}
+            <div class="btn-group-vertical btn-group-md-horizontal">
+                <a href="{{ url_for('upload_coverage', slug=project.slug) }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-upload me-2"></i>Upload Report
+                </a>
+            </div>
             {% endif %}
         </div>
         

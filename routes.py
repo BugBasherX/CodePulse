@@ -8,6 +8,7 @@ from replit_auth import require_login, make_replit_blueprint
 from parsers.coverage_parser import CoverageParser
 from utils.coverage_analyzer import CoverageAnalyzer
 from utils.badge_generator import BadgeGenerator
+from flask import send_from_directory
 import uuid
 from datetime import datetime, timedelta
 from sqlalchemy import desc
@@ -309,3 +310,11 @@ def not_found(error):
 @app.errorhandler(403)
 def forbidden(error):
     return render_template('403.html', error_message="Access denied"), 403
+
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json')
+
+@app.route('/service-worker.js')
+def service_worker():
+    return send_from_directory('static', 'service-worker.js')

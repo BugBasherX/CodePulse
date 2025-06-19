@@ -18,16 +18,16 @@
 </div>
 
 <!-- Summary Cards -->
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
         <div class="card bg-primary text-white">
-            <div class="card-body">
+            <div class="card-body p-3">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h6 class="card-title text-white-50">Total Projects</h6>
-                        <h3 class="mb-0">{{ projects|length }}</h3>
+                        <h6 class="card-title text-white-50 small">Total Projects</h6>
+                        <h4 class="mb-0">{{ projects|length }}</h4>
                     </div>
-                    <div class="align-self-center">
+                    <div class="align-self-center d-none d-sm-block">
                         <i class="fas fa-project-diagram fa-2x opacity-75"></i>
                     </div>
                 </div>
@@ -35,19 +35,19 @@
         </div>
     </div>
     
-    <div class="col-md-3">
+    <div class="col-6 col-md-3">
         <div class="card bg-success text-white">
-            <div class="card-body">
+            <div class="card-body p-3">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h6 class="card-title text-white-50">Avg Coverage</h6>
-                        <h3 class="mb-0">
+                        <h6 class="card-title text-white-50 small">Avg Coverage</h6>
+                        <h4 class="mb-0">
                             {% if projects %}
                                 {{ "%.1f"|format((projects|sum(attribute='coverage_percentage')) / projects|length) }}%
                             {% else %}
                                 0.0%
                             {% endif %}
-                        </h3>
+                        </h4>
                     </div>
                     <div class="align-self-center">
                         <i class="fas fa-chart-line fa-2x opacity-75"></i>
@@ -111,8 +111,8 @@
                         <thead class="table-dark">
                             <tr>
                                 <th>Project</th>
-                                <th>Coverage</th>
-                                <th>Last Update</th>
+                                <th class="d-none d-md-table-cell">Coverage</th>
+                                <th class="d-none d-lg-table-cell">Last Update</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -121,22 +121,32 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="project-icon me-3">
+                                        <div class="project-icon me-2 d-none d-sm-block">
                                             <i class="fas fa-cube text-primary"></i>
                                         </div>
-                                        <div>
+                                        <div class="flex-grow-1">
                                             <h6 class="mb-0">
                                                 <a href="{{ url_for('project_detail', slug=project.slug) }}" class="text-decoration-none">
                                                     {{ project.name }}
                                                 </a>
                                             </h6>
                                             {% if project.description %}
-                                            <small class="text-muted">{{ project.description[:50] }}{% if project.description|length > 50 %}...{% endif %}</small>
+                                            <small class="text-muted d-none d-md-block">{{ project.description[:50] }}{% if project.description|length > 50 %}...{% endif %}</small>
                                             {% endif %}
+                                            <!-- Mobile coverage display -->
+                                            <div class="d-sm-none mt-1">
+                                                {% if project.latest_coverage %}
+                                                <span class="badge bg-{{ project.latest_coverage.coverage_color }}">
+                                                    {{ "%.1f"|format(project.coverage_percentage) }}%
+                                                </span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">No data</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="d-none d-md-table-cell">
                                     {% if project.latest_coverage %}
                                     <div class="d-flex align-items-center">
                                         <div class="progress me-2" style="width: 80px; height: 8px;">
@@ -161,7 +171,7 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <div class="btn-group btn-group-sm">
+                                    <div class="btn-group btn-group-sm d-none d-md-flex">
                                         <a href="{{ url_for('project_detail', slug=project.slug) }}" 
                                            class="btn btn-outline-primary">
                                             <i class="fas fa-eye"></i>
@@ -170,6 +180,22 @@
                                            class="btn btn-outline-success">
                                             <i class="fas fa-upload"></i>
                                         </a>
+                                    </div>
+                                    <!-- Mobile action menu -->
+                                    <div class="d-md-none">
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="{{ url_for('project_detail', slug=project.slug) }}">
+                                                    <i class="fas fa-eye me-2"></i>View
+                                                </a></li>
+                                                <li><a class="dropdown-item" href="{{ url_for('upload_coverage', slug=project.slug) }}">
+                                                    <i class="fas fa-upload me-2"></i>Upload
+                                                </a></li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
