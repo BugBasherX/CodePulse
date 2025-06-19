@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Access Denied - CodePulse{% endblock %}
+
+{% block main_class %}container d-flex align-items-center justify-content-center{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <div class="error-page">
+        <!-- Error Icon -->
+        <div class="error-icon mb-4">
+            <i class="fas fa-shield-alt fa-5x text-danger"></i>
+        </div>
+        
+        <!-- Error Message -->
+        <h1 class="display-4 fw-bold text-danger mb-3">Access Denied</h1>
+        
+        {% if error_message %}
+        <p class="lead text-muted mb-4">{{ error_message }}</p>
+        {% else %}
+        <p class="lead text-muted mb-4">
+            You don't have permission to access this resource.
+        </p>
+        {% endif %}
+        
+        <!-- Additional Information -->
+        <div class="alert alert-warning d-inline-block" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {% if not current_user.is_authenticated %}
+            You may need to <a href="{{ url_for('replit_auth.login') }}" class="alert-link">sign in</a> to access this page.
+            {% else %}
+            This resource requires appropriate permissions to access.
+            {% endif %}
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="mt-4">
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary me-3">
+                <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+            </a>
+            {% else %}
+            <a href="{{ url_for('replit_auth.login') }}" class="btn btn-primary me-3">
+                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </a>
+            {% endif %}
+            
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-home me-2"></i>Home Page
+            </a>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="mt-5 pt-4 border-top">
+            <h5 class="text-muted">Need Help?</h5>
+            <p class="text-muted">
+                If you believe you should have access to this resource, please check:
+            </p>
+            <ul class="list-unstyled text-muted">
+                <li><i class="fas fa-check-circle text-success me-2"></i>You are signed in to the correct account</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i>You have the necessary permissions for this project</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i>The project exists and is accessible</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.error-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.error-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+</style>
+{% endblock %}

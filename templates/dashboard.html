@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CodePulse{% endblock %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='js/dashboard.js') }}" rel="preload" as="script">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">
+        <i class="fas fa-tachometer-alt text-primary me-2"></i>
+        Dashboard
+    </h1>
+    <a href="{{ url_for('new_project') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>New Project
+    </a>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title text-white-50">Total Projects</h6>
+                        <h3 class="mb-0">{{ projects|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-project-diagram fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title text-white-50">Avg Coverage</h6>
+                        <h3 class="mb-0">
+                            {% if projects %}
+                                {{ "%.1f"|format((projects|sum(attribute='coverage_percentage')) / projects|length) }}%
+                            {% else %}
+                                0.0%
+                            {% endif %}
+                        </h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title text-white-50">Reports</h6>
+                        <h3 class="mb-0">{{ recent_reports|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-file-alt fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title text-white-50">Active</h6>
+                        <h3 class="mb-0">
+                            {{ projects|selectattr('latest_coverage')|list|length }}
+                        </h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Projects List -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-folder me-2"></i>Your Projects
+                </h5>
+                <a href="{{ url_for('new_project') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-plus me-1"></i>Add Project
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if projects %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Project</th>
+                                <th>Coverage</th>
+                                <th>Last Update</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in projects %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="project-icon me-3">
+                                            <i class="fas fa-cube text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">
+                                                <a href="{{ url_for('project_detail', slug=project.slug) }}" class="text-decoration-none">
+                                                    {{ project.name }}
+                                                </a>
+                                            </h6>
+                                            {% if project.description %}
+                                            <small class="text-muted">{{ project.description[:50] }}{% if project.description|length > 50 %}...{% endif %}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if project.latest_coverage %}
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress me-2" style="width: 80px; height: 8px;">
+                                            <div class="progress-bar bg-{{ project.latest_coverage.coverage_color }}" 
+                                                 style="width: {{ project.coverage_percentage }}%"></div>
+                                        </div>
+                                        <span class="text-{{ project.latest_coverage.coverage_color }}">
+                                            {{ "%.1f"|format(project.coverage_percentage) }}%
+                                        </span>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-muted">No reports</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if project.latest_coverage %}
+                                    <small class="text-muted">
+                                        {{ project.latest_coverage.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                    {% else %}
+                                    <small class="text-muted">Never</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('project_detail', slug=project.slug) }}" 
+                                           class="btn btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('upload_coverage', slug=project.slug) }}" 
+                                           class="btn btn-outline-success">
+                                            <i class="fas fa-upload"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No projects yet</h5>
+                    <p class="text-muted">Create your first project to start monitoring code coverage</p>
+                    <a href="{{ url_for('new_project') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create Project
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>Recent Activity
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_reports %}
+                <div class="list-group list-group-flush">
+                    {% for report in recent_reports[:5] %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">
+                                    <a href="{{ url_for('project_detail', slug=report.project.slug) }}" 
+                                       class="text-decoration-none">
+                                        {{ report.project.name }}
+                                    </a>
+                                </h6>
+                                <p class="mb-1 small">
+                                    Coverage: 
+                                    <span class="text-{{ report.coverage_color }}">
+                                        {{ "%.1f"|format(report.coverage_percentage) }}%
+                                    </span>
+                                    {% if report.commit_sha %}
+                                    <br>
+                                    <code class="small">{{ report.commit_sha[:8] }}</code>
+                                    {% endif %}
+                                </p>
+                                <small class="text-muted">
+                                    {{ report.created_at.strftime('%m/%d %H:%M') }}
+                                </small>
+                            </div>
+                            <div class="coverage-indicator">
+                                <i class="fas fa-circle text-{{ report.coverage_color }}"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-history fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0">No recent activity</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

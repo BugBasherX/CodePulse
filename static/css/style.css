@@ -1,0 +1,537 @@
+/* CodePulse - Professional Code Coverage Monitoring Platform Styles */
+
+:root {
+    /* Color Variables */
+    --coverage-excellent: #10b981;   /* Green - 90%+ */
+    --coverage-good: #22c55e;        /* Light Green - 80-89% */
+    --coverage-fair: #eab308;        /* Yellow - 70-79% */
+    --coverage-warning: #f59e0b;     /* Orange - 60-69% */
+    --coverage-poor: #ef4444;        /* Red - <60% */
+    --coverage-uncovered: #dc2626;   /* Dark Red - Uncovered */
+    
+    /* Theme Colors */
+    --primary-color: #3b82f6;
+    --secondary-color: #6b7280;
+    --success-color: var(--coverage-excellent);
+    --warning-color: var(--coverage-warning);
+    --danger-color: var(--coverage-poor);
+    
+    /* Background Colors */
+    --bg-primary: #1f2937;
+    --bg-secondary: #374151;
+    --bg-tertiary: #4b5563;
+    
+    /* Text Colors */
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+}
+
+/* Global Styles */
+body {
+    background-color: #111827;
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Navigation Enhancements */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--text-primary);
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    min-height: 80vh;
+}
+
+.hero-visual {
+    transform: perspective(1000px) rotateY(-5deg);
+    transition: transform 0.3s ease;
+}
+
+.hero-visual:hover {
+    transform: perspective(1000px) rotateY(0deg);
+}
+
+.coverage-demo {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Cards */
+.card {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--bg-secondary);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    border-color: var(--bg-tertiary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--bg-tertiary);
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* Feature Cards */
+.feature-card {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--bg-tertiary);
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    background-color: var(--bg-tertiary) !important;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.feature-icon {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+/* Coverage Progress Bars */
+.progress {
+    background-color: var(--bg-tertiary);
+    border-radius: 6px;
+}
+
+.progress-bar {
+    border-radius: 6px;
+    transition: width 0.6s ease;
+}
+
+.bg-success, .progress-bar.bg-success {
+    background-color: var(--coverage-excellent) !important;
+}
+
+.bg-warning, .progress-bar.bg-warning {
+    background-color: var(--coverage-warning) !important;
+}
+
+.bg-danger, .progress-bar.bg-danger {
+    background-color: var(--coverage-poor) !important;
+}
+
+/* Coverage Indicators */
+.coverage-circle {
+    position: relative;
+    display: inline-block;
+}
+
+.coverage-text {
+    font-size: 14px;
+    font-weight: 600;
+    fill: var(--text-primary);
+}
+
+/* Coverage Color Classes */
+.text-success {
+    color: var(--coverage-excellent) !important;
+}
+
+.text-warning {
+    color: var(--coverage-warning) !important;
+}
+
+.text-danger {
+    color: var(--coverage-poor) !important;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background-color: var(--coverage-excellent);
+    border-color: var(--coverage-excellent);
+}
+
+.btn-success:hover {
+    background-color: #059669;
+    border-color: #059669;
+}
+
+/* Tables */
+.table-dark {
+    --bs-table-bg: var(--bg-secondary);
+    --bs-table-border-color: var(--bg-tertiary);
+}
+
+.table-hover > tbody > tr:hover > td {
+    background-color: var(--bg-secondary);
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+    border-radius: 6px;
+}
+
+/* Forms */
+.form-control {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--bg-tertiary);
+    color: var(--text-primary);
+    border-radius: 8px;
+}
+
+.form-control:focus {
+    background-color: var(--bg-secondary);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.form-select {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+/* Alerts */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.alert-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border-left: 4px solid var(--primary-color);
+}
+
+.alert-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--coverage-excellent);
+    border-left: 4px solid var(--coverage-excellent);
+}
+
+.alert-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--coverage-warning);
+    border-left: 4px solid var(--coverage-warning);
+}
+
+.alert-danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--coverage-poor);
+    border-left: 4px solid var(--coverage-poor);
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--bg-tertiary);
+    border-radius: 8px;
+}
+
+.dropdown-item {
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Code Blocks */
+pre {
+    background-color: #0f172a !important;
+    border: 1px solid var(--bg-tertiary);
+    border-radius: 8px;
+    color: #e2e8f0;
+}
+
+code {
+    background-color: var(--bg-secondary);
+    color: #60a5fa;
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.875em;
+}
+
+/* Step Numbers */
+.step-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    transition: transform 0.3s ease;
+}
+
+.step-number:hover {
+    transform: scale(1.1);
+}
+
+/* Project Icons */
+.project-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.project-icon:hover {
+    background-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+/* Coverage Heatmap */
+.coverage-heatmap {
+    font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.line-number {
+    color: var(--text-muted);
+    text-align: right;
+    padding-right: 1rem;
+    user-select: none;
+    border-right: 1px solid var(--bg-tertiary);
+}
+
+.line-covered {
+    background-color: rgba(16, 185, 129, 0.2);
+    border-left: 3px solid var(--coverage-excellent);
+}
+
+.line-uncovered {
+    background-color: rgba(239, 68, 68, 0.2);
+    border-left: 3px solid var(--coverage-poor);
+}
+
+.line-partial {
+    background-color: rgba(245, 158, 11, 0.2);
+    border-left: 3px solid var(--coverage-warning);
+}
+
+/* File Tree */
+.file-tree {
+    font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+}
+
+.file-tree .folder {
+    color: #60a5fa;
+}
+
+.file-tree .file {
+    color: var(--text-secondary);
+}
+
+/* Statistics Cards */
+.stat-icon {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .stat-icon {
+    transform: scale(1.1);
+}
+
+/* Loading States */
+.loading-skeleton {
+    background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-visual {
+        transform: none;
+        margin-top: 2rem;
+    }
+    
+    .coverage-demo {
+        margin: 0 1rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Dark Theme Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+/* Utility Classes */
+.text-purple {
+    color: #a855f7 !important;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.border-start-success {
+    border-left: 4px solid var(--coverage-excellent) !important;
+}
+
+.border-start-warning {
+    border-left: 4px solid var(--coverage-warning) !important;
+}
+
+.border-start-danger {
+    border-left: 4px solid var(--coverage-poor) !important;
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Coverage Badge Styles */
+.coverage-badge {
+    display: inline-block;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+}
+
+.coverage-badge:hover {
+    transform: scale(1.05);
+}
+
+/* Interactive Elements */
+.clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clickable:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+}
+
+/* Footer */
+footer {
+    background-color: var(--bg-primary) !important;
+    border-top: 1px solid var(--bg-secondary) !important;
+}
+
+/* Custom Select Styling */
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    .btn,
+    .card-header .btn,
+    footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+}

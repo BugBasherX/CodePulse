@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - CodePulse{% endblock %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='js/coverage-heatmap.js') }}" rel="preload" as="script">
+{% endblock %}
+
+{% block content %}
+<!-- Project Header -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">{{ project.name }}</li>
+            </ol>
+        </nav>
+        
+        <div class="d-flex align-items-center mb-2">
+            <h1 class="h2 mb-0 me-3">{{ project.name }}</h1>
+            {% if project.is_public %}
+            <span class="badge bg-success">Public</span>
+            {% else %}
+            <span class="badge bg-secondary">Private</span>
+            {% endif %}
+        </div>
+        
+        {% if project.description %}
+        <p class="text-muted">{{ project.description }}</p>
+        {% endif %}
+        
+        {% if project.github_repo %}
+        <p class="mb-0">
+            <i class="fab fa-github me-2"></i>
+            <a href="https://github.com/{{ project.github_repo }}" target="_blank" class="text-decoration-none">
+                {{ project.github_repo }}
+            </a>
+        </p>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4 text-md-end">
+        {% if current_user.is_authenticated and current_user.id == project.owner_id %}
+        <div class="btn-group mb-3">
+            <a href="{{ url_for('upload_coverage', slug=project.slug) }}" class="btn btn-success">
+                <i class="fas fa-upload me-2"></i>Upload Report
+            </a>
+            <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('settings') }}">
+                    <i class="fas fa-cog me-2"></i>Project Settings
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('coverage_badge', slug=project.slug) }}" target="_blank">
+                    <i class="fas fa-shield-alt me-2"></i>Coverage Badge
+                </a></li>
+            </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Coverage Badge Preview -->
+        <div class="mb-3">
+            <img src="{{ url_for('coverage_badge', slug=project.slug) }}" alt="Coverage Badge" class="img-fluid">
+        </div>
+    </div>
+</div>
+
+<!-- Coverage Summary -->
+{% if project.latest_coverage %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <div class="coverage-circle mx-auto mb-3" data-percentage="{{ project.coverage_percentage }}">
+                    <svg width="80" height="80" viewBox="0 0 80 80">
+                        <circle cx="40" cy="40" r="35" fill="none" stroke="#374151" stroke-width="8"/>
+                        <circle cx="40" cy="40" r="35" fill="none" stroke="#10b981" stroke-width="8" 
+                                stroke-dasharray="{{ (project.coverage_percentage * 220 / 100)|round(2) }} 220"
+                                stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                        <text x="40" y="45" text-anchor="middle" class="coverage-text fw-bold">
+                            {{ "%.1f"|format(project.coverage_percentage) }}%
+                        </text>
+                    </svg>
+                </div>
+                <h6 class="card-title">Overall Coverage</h6>
+                <p class="text-muted small mb-0">
+                    {{ project.latest_coverage.lines_covered }} / {{ project.latest_coverage.lines_total }} lines
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="stat-icon text-success mb-3">
+                    <i class="fas fa-code fa-2x"></i>
+                </div>
+                <h3 class="text-success">{{ project.latest_coverage.lines_covered }}</h3>
+                <h6 class="card-title">Lines Covered</h6>
+                <p class="text-muted small mb-0">
+                    Out of {{ project.latest_coverage.lines_total }} total
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="stat-icon text-info mb-3">
+                    <i class="fas fa-project-diagram fa-2x"></i>
+                </div>
+                <h3 class="text-info">{{ project.latest_coverage.functions_covered }}</h3>
+                <h6 class="card-title">Functions</h6>
+                <p class="text-muted small mb-0">
+                    Out of {{ project.latest_coverage.functions_total }} total
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="stat-icon text-warning mb-3">
+                    <i class="fas fa-code-branch fa-2x"></i>
+                </div>
+                <h3 class="text-warning">{{ project.latest_coverage.branches_covered }}</h3>
+                <h6 class="card-title">Branches</h6>
+                <p class="text-muted small mb-0">
+                    Out of {{ project.latest_coverage.branches_total }} total
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- Coverage Trend Chart -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Coverage Trend
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if trend_reports %}
+                <canvas id="coverageTrendChart" height="300"></canvas>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No trend data available</h5>
+                    <p class="text-muted">Upload more coverage reports to see trends</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Reports -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-alt me-2"></i>Recent Reports
+                </h5>
+                {% if current_user.is_authenticated and current_user.id == project.owner_id %}
+                <a href="{{ url_for('upload_coverage', slug=project.slug) }}" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-plus"></i>
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                {% if reports %}
+                <div class="list-group list-group-flush">
+                    {% for report in reports[:10] %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="d-flex align-items-center mb-1">
+                                    <span class="badge bg-{{ report.coverage_color }} me-2">
+                                        {{ "%.1f"|format(report.coverage_percentage) }}%
+                                    </span>
+                                    {% if report.branch %}
+                                    <code class="small">{{ report.branch }}</code>
+                                    {% endif %}
+                                </div>
+                                {% if report.commit_sha %}
+                                <div class="small text-muted mb-1">
+                                    <i class="fas fa-code-branch me-1"></i>
+                                    <code>{{ report.commit_sha[:8] }}</code>
+                                </div>
+                                {% endif %}
+                                <small class="text-muted">
+                                    {{ report.created_at.strftime('%m/%d/%Y %H:%M') }}
+                                </small>
+                            </div>
+                            <a href="{{ url_for('file_coverage', slug=project.slug, report_id=report.id) }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0">No reports uploaded</p>
+                    {% if current_user.is_authenticated and current_user.id == project.owner_id %}
+                    <a href="{{ url_for('upload_coverage', slug=project.slug) }}" class="btn btn-sm btn-primary mt-2">
+                        Upload First Report
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if project.latest_coverage and project.latest_coverage.file_coverages %}
+<!-- File Coverage Overview -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-folder-open me-2"></i>File Coverage
+                </h5>
+                <a href="{{ url_for('file_coverage', slug=project.slug, report_id=project.latest_coverage.id) }}" 
+                   class="btn btn-sm btn-outline-primary">
+                    View All Files
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>File</th>
+                                <th>Coverage</th>
+                                <th>Lines</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file_cov in project.latest_coverage.file_coverages[:10] %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-file-code text-muted me-2"></i>
+                                        <span class="font-monospace">{{ file_cov.file_path }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress me-2" style="width: 80px; height: 6px;">
+                                            <div class="progress-bar bg-{{ file_cov.coverage_color }}" 
+                                                 style="width: {{ file_cov.coverage_percentage }}%"></div>
+                                        </div>
+                                        <span class="text-{{ file_cov.coverage_color }}">
+                                            {{ "%.1f"|format(file_cov.coverage_percentage) }}%
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-muted">
+                                        {{ file_cov.lines_covered }} / {{ file_cov.lines_total }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-secondary" 
+                                            onclick="showFileDetails('{{ file_cov.file_path }}', {{ file_cov.id }})">
+                                        <i class="fas fa-code"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/coverage-heatmap.js') }}"></script>
+<script>
+// Coverage trend chart
+{% if trend_reports %}
+const ctx = document.getElementById('coverageTrendChart').getContext('2d');
+const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [
+            {% for report in trend_reports %}
+            '{{ report.created_at.strftime("%m/%d") }}'{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Coverage %',
+            data: [
+                {% for report in trend_reports %}
+                {{ report.coverage_percentage }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                    callback: function(value) {
+                        return value + '%';
+                    }
+                }
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return 'Coverage: ' + context.parsed.y.toFixed(1) + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+{% endif %}
+
+function showFileDetails(filePath, fileId) {
+    // This would open a modal or navigate to file details
+    console.log('Show details for:', filePath);
+}
+</script>
+{% endblock %}

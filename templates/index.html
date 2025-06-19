@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}CodePulse - Professional Code Coverage Monitoring{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section bg-gradient text-white py-5">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Professional Code Coverage 
+                    <span class="text-primary">Monitoring</span>
+                </h1>
+                <p class="lead mb-4">
+                    Track, analyze, and improve your code coverage with CodePulse. 
+                    Get detailed insights, historical trends, and seamless CI/CD integration.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ url_for('replit_auth.login') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-rocket me-2"></i>Get Started
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-info-circle me-2"></i>Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual p-4">
+                    <div class="coverage-demo bg-dark rounded p-4 shadow-lg">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0"><i class="fas fa-chart-line text-primary me-2"></i>Coverage Overview</h6>
+                            <span class="badge bg-success fs-6">87.5%</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: 87.5%"></div>
+                        </div>
+                        <div class="row text-center mt-3">
+                            <div class="col-4">
+                                <div class="text-success">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <small class="text-muted">2,847 Lines</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-warning">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <small class="text-muted">156 Functions</small>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-info">
+                                    <i class="fas fa-code-branch"></i>
+                                </div>
+                                <small class="text-muted">89 Branches</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section id="features" class="py-5 bg-dark">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Powerful Features</h2>
+            <p class="lead text-muted">Everything you need for comprehensive code coverage monitoring</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4 bg-secondary rounded">
+                    <div class="feature-icon text-primary mb-3">
+                        <i class="fas fa-file-code fa-2x"></i>
+                    </div>
+                    <h5>Multiple Formats</h5>
+                    <p class="text-muted">Support for coverage.xml, lcov.info, cobertura.xml, JaCoCo, and more formats.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4 bg-secondary rounded">
+                    <div class="feature-icon text-success mb-3">
+                        <i class="fas fa-chart-area fa-2x"></i>
+                    </div>
+                    <h5>Interactive Dashboards</h5>
+                    <p class="text-muted">Beautiful visualizations with coverage trends, file heatmaps, and detailed reports.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4 bg-secondary rounded">
+                    <div class="feature-icon text-warning mb-3">
+                        <i class="fas fa-code-branch fa-2x"></i>
+                    </div>
+                    <h5>GitHub Integration</h5>
+                    <p class="text-muted">Seamless integration with GitHub repositories and pull request workflows.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4 bg-secondary rounded">
+                    <div class="feature-icon text-info mb-3">
+                        <i class="fas fa-history fa-2x"></i>
+                    </div>
+                    <h5>Historical Tracking</h5>
+                    <p class="text-muted">Track coverage changes over time with detailed historical analysis.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4 bg-secondary rounded">
+                    <div class="feature-icon text-danger mb-3">
+                        <i class="fas fa-shield-alt fa-2x"></i>
+                    </div>
+                    <h5>Coverage Badges</h5>
+                    <p class="text-muted">Generate beautiful SVG badges to display coverage status in your README.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card h-100 p-4 bg-secondary rounded">
+                    <div class="feature-icon text-purple mb-3">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                    <h5>Team Management</h5>
+                    <p class="text-muted">Collaborate with your team and manage project access with role-based permissions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Getting Started Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Get Started in Minutes</h2>
+            <p class="lead text-muted">Simple setup process to get your coverage monitoring running</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">1</span>
+                    </div>
+                    <h5>Create Account</h5>
+                    <p class="text-muted">Sign up with your GitHub account or email to get started quickly.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="step-number bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">2</span>
+                    </div>
+                    <h5>Create Project</h5>
+                    <p class="text-muted">Set up your project and link it to your repository for seamless integration.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="step-number bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">3</span>
+                    </div>
+                    <h5>Upload Coverage</h5>
+                    <p class="text-muted">Upload your coverage reports and start monitoring your code quality.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{{ url_for('replit_auth.login') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-rocket me-2"></i>Start Monitoring Now
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

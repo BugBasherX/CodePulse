@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Coverage Report - {{ project.name }} - CodePulse{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('project_detail', slug=project.slug) }}">{{ project.name }}</a></li>
+        <li class="breadcrumb-item active">Upload Coverage</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-upload me-2 text-primary"></i>
+                    Upload Coverage Report
+                </h4>
+                <p class="text-muted mb-0 mt-1">Upload a coverage report for {{ project.name }}</p>
+            </div>
+            <div class="card-body">
+                <!-- Upload Form -->
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="mb-4">
+                        <label for="coverage_file" class="form-label">
+                            <i class="fas fa-file-alt me-2"></i>Coverage Report File
+                        </label>
+                        <input type="file" class="form-control" id="coverage_file" name="coverage_file" 
+                               accept=".xml,.info,.lcov" required>
+                        <div class="form-text">
+                            Supported formats: coverage.xml, cobertura.xml, jacoco.xml, lcov.info
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="commit_sha" class="form-label">
+                                <i class="fas fa-code-branch me-2"></i>Commit SHA (Optional)
+                            </label>
+                            <input type="text" class="form-control font-monospace" id="commit_sha" 
+                                   name="commit_sha" placeholder="e.g., a1b2c3d4e5f6">
+                            <div class="form-text">Git commit hash for this coverage report</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="branch" class="form-label">
+                                <i class="fas fa-project-diagram me-2"></i>Branch
+                            </label>
+                            <input type="text" class="form-control" id="branch" name="branch" 
+                                   value="{{ project.default_branch }}" placeholder="main">
+                            <div class="form-text">Git branch name</div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('project_detail', slug=project.slug) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success" id="uploadBtn">
+                            <i class="fas fa-upload me-2"></i>Upload Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Upload Instructions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>How to Generate Coverage Reports
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <!-- Python -->
+                    <div class="col-md-6">
+                        <h6 class="text-primary">
+                            <i class="fab fa-python me-2"></i>Python (coverage.py)
+                        </h6>
+                        <pre class="bg-dark text-light p-3 rounded small"><code># Install coverage
+pip install coverage
+
+# Run tests with coverage
+coverage run -m pytest
+
+# Generate XML report
+coverage xml</code></pre>
+                    </div>
+                    
+                    <!-- JavaScript -->
+                    <div class="col-md-6">
+                        <h6 class="text-warning">
+                            <i class="fab fa-js-square me-2"></i>JavaScript (Istanbul/NYC)
+                        </h6>
+                        <pre class="bg-dark text-light p-3 rounded small"><code># Install nyc
+npm install --save-dev nyc
+
+# Run tests with coverage
+nyc npm test
+
+# Generate lcov report
+nyc report --reporter=lcov</code></pre>
+                    </div>
+                    
+                    <!-- Java -->
+                    <div class="col-md-6">
+                        <h6 class="text-danger">
+                            <i class="fab fa-java me-2"></i>Java (JaCoCo)
+                        </h6>
+                        <pre class="bg-dark text-light p-3 rounded small"><code># Maven
+mvn jacoco:report
+
+# Gradle
+gradle jacocoTestReport
+
+# Report location:
+# target/site/jacoco/jacoco.xml</code></pre>
+                    </div>
+                    
+                    <!-- Go -->
+                    <div class="col-md-6">
+                        <h6 class="text-info">
+                            <i class="fas fa-code me-2"></i>Go
+                        </h6>
+                        <pre class="bg-dark text-light p-3 rounded small"><code># Run tests with coverage
+go test -coverprofile=coverage.out
+
+# Convert to XML (using gocov-xml)
+gocov convert coverage.out | gocov-xml > coverage.xml</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- API Upload Instructions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-terminal me-2"></i>API Upload
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">You can also upload coverage reports via API using your token:</p>
+                <div class="bg-dark text-light p-3 rounded">
+                    <code>curl -X POST \<br>
+                    &nbsp;&nbsp;-H "Authorization: Bearer YOUR_API_TOKEN" \<br>
+                    &nbsp;&nbsp;-F "file=@coverage.xml" \<br>
+                    &nbsp;&nbsp;-F "project={{ project.slug }}" \<br>
+                    &nbsp;&nbsp;-F "branch=main" \<br>
+                    &nbsp;&nbsp;-F "commit=COMMIT_SHA" \<br>
+                    &nbsp;&nbsp;{{ request.url_root }}api/upload</code>
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        Get your API token from <a href="{{ url_for('settings') }}">Settings</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('coverage_file');
+    
+    if (!fileInput.files.length) {
+        e.preventDefault();
+        alert('Please select a coverage report file');
+        return;
+    }
+    
+    // Show loading state
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+});
+
+// File size validation
+document.getElementById('coverage_file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Check file size (10MB limit)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File size must be less than 10MB');
+            e.target.value = '';
+            return;
+        }
+        
+        // Validate file extension
+        const validExtensions = ['.xml', '.info', '.lcov'];
+        const fileName = file.name.toLowerCase();
+        const isValid = validExtensions.some(ext => fileName.endsWith(ext));
+        
+        if (!isValid) {
+            alert('Please select a valid coverage report file (.xml, .info, .lcov)');
+            e.target.value = '';
+            return;
+        }
+    }
+});
+</script>
+{% endblock %}

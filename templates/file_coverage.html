@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+
+{% block title %}File Coverage - {{ project.name }} - CodePulse{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('project_detail', slug=project.slug) }}">{{ project.name }}</a></li>
+        <li class="breadcrumb-item active">File Coverage</li>
+    </ol>
+</nav>
+
+<!-- Report Header -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="h2">File Coverage Report</h1>
+        <p class="text-muted">
+            Coverage report from {{ report.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+            {% if report.commit_sha %}
+            for commit <code>{{ report.commit_sha[:8] }}</code>
+            {% endif %}
+            {% if report.branch %}
+            on branch <code>{{ report.branch }}</code>
+            {% endif %}
+        </p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <div class="btn-group">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-filter me-2"></i>Filter
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" onclick="filterFiles('all')">All Files</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterFiles('high')">High Coverage (≥80%)</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterFiles('medium')">Medium Coverage (60-79%)</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterFiles('low')">Low Coverage (<60%)</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">{{ file_coverages|length }}</h3>
+                <h6 class="card-title">Total Files</h6>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-success">{{ file_coverages|selectattr('coverage_percentage', '>=', 80)|list|length }}</h3>
+                <h6 class="card-title">High Coverage</h6>
+                <small class="text-muted">≥80%</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-warning">{{ file_coverages|selectattr('coverage_percentage', '<', 80)|selectattr('coverage_percentage', '>=', 60)|list|length }}</h3>
+                <h6 class="card-title">Medium Coverage</h6>
+                <small class="text-muted">60-79%</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-danger">{{ file_coverages|selectattr('coverage_percentage', '<', 60)|list|length }}</h3>
+                <h6 class="card-title">Low Coverage</h6>
+                <small class="text-muted"><60%</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Coverage Table -->
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="mb-0">
+                    <i class="fas fa-folder-open me-2"></i>File Coverage Details
+                </h5>
+            </div>
+            <div class="col-auto">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="fileSearch" placeholder="Search files...">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% if file_coverages %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="fileTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 50%;">
+                            <a href="#" class="text-white text-decoration-none sort-header" data-sort="path">
+                                File Path <i class="fas fa-sort ms-1"></i>
+                            </a>
+                        </th>
+                        <th style="width: 20%;">
+                            <a href="#" class="text-white text-decoration-none sort-header" data-sort="coverage">
+                                Coverage <i class="fas fa-sort ms-1"></i>
+                            </a>
+                        </th>
+                        <th style="width: 20%;">
+                            <a href="#" class="text-white text-decoration-none sort-header" data-sort="lines">
+                                Lines <i class="fas fa-sort ms-1"></i>
+                            </a>
+                        </th>
+                        <th style="width: 10%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file_cov in file_coverages %}
+                    <tr class="file-row" 
+                        data-coverage="{{ file_cov.coverage_percentage }}" 
+                        data-path="{{ file_cov.file_path|lower }}">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-code text-muted me-2"></i>
+                                <span class="font-monospace text-break">{{ file_cov.file_path }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="progress me-2" style="width: 60px; height: 6px;">
+                                    <div class="progress-bar bg-{{ file_cov.coverage_color }}" 
+                                         style="width: {{ file_cov.coverage_percentage }}%"></div>
+                                </div>
+                                <span class="text-{{ file_cov.coverage_color }} fw-bold">
+                                    {{ "%.1f"|format(file_cov.coverage_percentage) }}%
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-muted">
+                                <span class="text-{{ file_cov.coverage_color }}">{{ file_cov.lines_covered }}</span>
+                                / {{ file_cov.lines_total }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    onclick="showLineDetails('{{ file_cov.file_path }}', {{ file_cov.id }})"
+                                    title="View Line Coverage">
+                                <i class="fas fa-code"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No file coverage data</h5>
+            <p class="text-muted">This report doesn't contain file-level coverage information</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Line Coverage Modal -->
+<div class="modal fade" id="lineCoverageModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-code me-2"></i>Line Coverage Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="lineCoverageContent">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentSort = { field: null, direction: 'asc' };
+
+// File filtering
+function filterFiles(level) {
+    const rows = document.querySelectorAll('.file-row');
+    
+    rows.forEach(row => {
+        const coverage = parseFloat(row.dataset.coverage);
+        let show = true;
+        
+        switch(level) {
+            case 'high':
+                show = coverage >= 80;
+                break;
+            case 'medium':
+                show = coverage >= 60 && coverage < 80;
+                break;
+            case 'low':
+                show = coverage < 60;
+                break;
+            case 'all':
+            default:
+                show = true;
+                break;
+        }
+        
+        row.style.display = show ? '' : 'none';
+    });
+}
+
+// File search
+document.getElementById('fileSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('.file-row');
+    
+    rows.forEach(row => {
+        const filePath = row.dataset.path;
+        const show = filePath.includes(searchTerm);
+        row.style.display = show ? '' : 'none';
+    });
+});
+
+// Table sorting
+document.querySelectorAll('.sort-header').forEach(header => {
+    header.addEventListener('click', function(e) {
+        e.preventDefault();
+        const sortField = this.dataset.sort;
+        const tbody = document.querySelector('#fileTable tbody');
+        const rows = Array.from(tbody.querySelectorAll('.file-row'));
+        
+        // Toggle sort direction
+        if (currentSort.field === sortField) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.field = sortField;
+            currentSort.direction = 'asc';
+        }
+        
+        // Sort rows
+        rows.sort((a, b) => {
+            let aVal, bVal;
+            
+            switch(sortField) {
+                case 'coverage':
+                    aVal = parseFloat(a.dataset.coverage);
+                    bVal = parseFloat(b.dataset.coverage);
+                    break;
+                case 'lines':
+                    aVal = parseInt(a.children[2].textContent.split('/')[1].trim());
+                    bVal = parseInt(b.children[2].textContent.split('/')[1].trim());
+                    break;
+                case 'path':
+                default:
+                    aVal = a.dataset.path;
+                    bVal = b.dataset.path;
+                    break;
+            }
+            
+            if (currentSort.direction === 'asc') {
+                return aVal > bVal ? 1 : -1;
+            } else {
+                return aVal < bVal ? 1 : -1;
+            }
+        });
+        
+        // Reorder rows in DOM
+        rows.forEach(row => tbody.appendChild(row));
+        
+        // Update sort indicators
+        document.querySelectorAll('.sort-header i').forEach(icon => {
+            icon.className = 'fas fa-sort ms-1';
+        });
+        
+        const icon = currentSort.direction === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+        this.querySelector('i').className = `fas ${icon} ms-1`;
+    });
+});
+
+// Show line coverage details
+function showLineDetails(filePath, fileId) {
+    const modal = new bootstrap.Modal(document.getElementById('lineCoverageModal'));
+    const content = document.getElementById('lineCoverageContent');
+    
+    // Update modal title
+    document.querySelector('#lineCoverageModal .modal-title').innerHTML = 
+        `<i class="fas fa-code me-2"></i>${filePath}`;
+    
+    // Show loading state
+    content.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading line coverage details...</p>
+        </div>
+    `;
+    
+    modal.show();
+    
+    // In a real implementation, this would fetch line-by-line coverage data
+    // For now, we'll show a placeholder
+    setTimeout(() => {
+        content.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Line-by-line coverage details would be displayed here.
+                This feature requires integration with the coverage report data structure.
+            </div>
+            <div class="code-coverage-viewer">
+                <div class="small text-muted mb-2">
+                    Coverage: <strong class="text-success">85.7%</strong> 
+                    (12 of 14 lines covered)
+                </div>
+                <div class="font-monospace small bg-dark p-3 rounded">
+                    <div class="line-coverage">
+                        <span class="line-number text-muted">1</span>
+                        <span class="line-covered text-success">●</span>
+                        <span class="line-code">function calculateCoverage(data) {</span>
+                    </div>
+                    <div class="line-coverage">
+                        <span class="line-number text-muted">2</span>
+                        <span class="line-covered text-success">●</span>
+                        <span class="line-code">  if (!data) return 0;</span>
+                    </div>
+                    <div class="line-coverage">
+                        <span class="line-number text-muted">3</span>
+                        <span class="line-uncovered text-danger">●</span>
+                        <span class="line-code">  // This line is not covered</span>
+                    </div>
+                    <div class="line-coverage">
+                        <span class="line-number text-muted">4</span>
+                        <span class="line-covered text-success">●</span>
+                        <span class="line-code">  return data.covered / data.total;</span>
+                    </div>
+                    <div class="line-coverage">
+                        <span class="line-number text-muted">5</span>
+                        <span class="line-covered text-success">●</span>
+                        <span class="line-code">}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }, 1000);
+}
+</script>
+
+<style>
+.line-coverage {
+    display: flex;
+    align-items: center;
+    padding: 2px 0;
+}
+
+.line-number {
+    width: 30px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.line-covered,
+.line-uncovered {
+    margin-right: 10px;
+    width: 10px;
+}
+
+.line-code {
+    flex: 1;
+}
+
+.code-coverage-viewer {
+    border: 1px solid #374151;
+    border-radius: 6px;
+    overflow: hidden;
+}
+</style>
+{% endblock %}
